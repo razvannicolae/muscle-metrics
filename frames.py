@@ -33,7 +33,9 @@ Data Specifications:
 """
 
 # Iterate through all subfolders
+
 def createFile():
+    '''Creates .npz file with pose tracking data'''
 
     video_folder = 'pose'
     frame_data_dict = {}
@@ -44,7 +46,7 @@ def createFile():
     for subfolder in subfolders:
 
         files = os.listdir(f"{video_folder}/{subfolder}/")
-        folderNum = f'session{subfolder[6:]}'
+        folderNum = subfolder[7:]
         frameData = np.empty(shape=[0, 77])
 
         # Iterate through all files in respective subfolder
@@ -58,13 +60,12 @@ def createFile():
                 json_data = json.load(json_file)
                 frameNum = file[0:file.index("_")]
 
-                frameData = np.append(frameData, [[folderNum, frameNum] + json_data["people"][0]["pose_keypoints_2d"]], axis = 0)
+                frameData = np.append(frameData, [[folderNum, str(int(frameNum))] + json_data["people"][0]["pose_keypoints_2d"]], axis = 0)
 
         frame_data_dict[folderNum] = frameData
 
     # Save all arrays for each recording session into a zipped numpy file
     np.savez('data/frameData.npz', **frame_data_dict)
-
 
 createFile()
 
