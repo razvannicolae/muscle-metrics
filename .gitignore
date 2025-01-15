@@ -1,0 +1,14 @@
+# Ignore all openpose files and data files
+.venv/
+3rdparty/
+bin/
+data/
+examples/
+frames/
+include/
+lib/
+models/
+python/
+instructions.txt
+LICENSE
+Version.txt
