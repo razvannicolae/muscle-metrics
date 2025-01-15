@@ -4,11 +4,12 @@
 bin/
 data/
 examples/
-frames/
+pose/
 include/
 lib/
 models/
 python/
+semg/
 instructions.txt
 LICENSE
 Version.txt
