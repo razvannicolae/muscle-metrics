@@ -25,7 +25,7 @@ def createPoseData():
                 json_data = json.load(json_file)
                 frameNum = file[0:file.index('_')]
                 # Append frame to poseData
-                poseData = np.append(poseData, [[sessionNum, str(int(frameNum))] + json_data['people'][0]['pose_keypoints_2d']], axis = 0)
+                poseData = np.append(poseData, [[sessionNum, str(int(frameNum))] + json_data['people'][0]['pose_keypoints_2d']], axis = 0).astype(np.float64)
         # Once all of the frames have been added to poseData add the numpy array for the session to the dict
         pose_data_dict[sessionNum] = poseData
     # Save all arrays for each recording session into a zipped numpy file
@@ -68,7 +68,7 @@ def createFrameData():
 
 # -------------------------------- TESTING -------------------------------- #
 
-createPoseData
+createPoseData()
 loaded_pose_data = np.load('data/poseData.npz')
 for file in loaded_pose_data.files:
     print(loaded_pose_data[file])
