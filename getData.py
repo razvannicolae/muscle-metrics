@@ -32,42 +32,42 @@ Data Specifications:
 - .npz files have a U32 dtype, will be converted when inputted into PyTorch
 """
 
-# Iterate through all subfolders
-
-def createFile():
-    '''Creates .npz file with pose tracking data'''
-
+def createFrameData():
+    '''Given openPose JSON output, creates frameData.npz file with pose tracking data'''
+    # Main directory for openPose JSON Outputs
     video_folder = 'pose'
+    # Dictionary that stores all np arrays for each session
     frame_data_dict = {}
-
-    # List of subfolders with individual frame JSON keypoints data
+    # List of subfolders from each session with individual frame JSON keypoints data
     subfolders = os.listdir(video_folder)
-
+    # Iterate through all subfolders
     for subfolder in subfolders:
-
+        # Get all the JSON frame files from each session
         files = os.listdir(f"{video_folder}/{subfolder}/")
-        folderNum = subfolder[7:]
+        sessionNum = subfolder[7:]
+        # Create empty numpy array to append data to
         frameData = np.empty(shape=[0, 77])
-
         # Iterate through all files in respective subfolder
         for file in files:
-
             file_path = f"{video_folder}/{subfolder}/{file}"
-
             # Open JSON file to extract data
             with open(file_path, 'r') as json_file:
-
                 json_data = json.load(json_file)
                 frameNum = file[0:file.index("_")]
-
-                frameData = np.append(frameData, [[folderNum, str(int(frameNum))] + json_data["people"][0]["pose_keypoints_2d"]], axis = 0)
-
-        frame_data_dict[folderNum] = frameData
-
+                # Append Frame 
+                frameData = np.append(frameData, [[sessionNum, str(int(frameNum))] + json_data["people"][0]["pose_keypoints_2d"]], axis = 0)
+        # Once all of the frames have been added to frameData add the numpy array for the session to the dict
+        frame_data_dict[sessionNum] = frameData
     # Save all arrays for each recording session into a zipped numpy file
     np.savez('data/frameData.npz', **frame_data_dict)
 
-createFile()
+def createSemgData():
+    '''Given txt file from arduino serial output, creates semgData.npz file with semg data'''
+
+def createFrameData():
+    '''Given semgData.npz and frameData.npz file, creates combinedData.npz file with synched data'''
+
+# -------------------------------- TESTING --------------------------------
 
 # Load data from npz file add sEMG readings and save again
 loaded_data = np.load('data/frameData.npz')
