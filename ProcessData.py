@@ -63,8 +63,11 @@ def createSemgData():
     # Save all the arrays in a zipped numpy files
     np.savez('data/semgData.npz', **semg_data_dict)
 
-def createFrameData():
-    '''Given poseData.npz and semgData.npz file, creates combinedData.npz file with synched data'''
+def createVectorData():
+    '''Given poseData.npz create vectorData.npz, a file with all unit vectors between points'''
+
+def createCombinedData():
+    '''Given vectorData.npz and semgData.npz file, creates combinedData.npz file with synched data'''
 
 # -------------------------------- TESTING -------------------------------- #
 
