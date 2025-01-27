@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Load the newly uploaded file's data again
-session_file_path = 'C:\\Users\\Shreyas\\Downloads\\session0.txt'
+session_file_path = 'semg\\session0.txt'
 with open(session_file_path, 'r') as file:
     session_data = file.readlines()
 
