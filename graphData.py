@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
 # Load the newly uploaded file's data again
-session_file_path = 'semg\session0.txt'
+session_file_path = 'semg\\session0.txt'
 with open(session_file_path, 'r') as file:
     session_data = file.readlines()
 
