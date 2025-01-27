@@ -1,8 +1,9 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 
 # Load the newly uploaded file's data again
-session_file_path = 'C:\\Users\\Shreyas\\Downloads\\session0.txt'
+session_file_path = 'semg\session0.txt'
 with open(session_file_path, 'r') as file:
     session_data = file.readlines()
 
@@ -49,13 +50,33 @@ session_df = pd.DataFrame(session_sensor_data)
 # Plotting each sensor's values against the frame number for the new session file
 fig, axs = plt.subplots(5, 1, figsize=(10, 20), constrained_layout=True)
 
+lines = []
 for i, sensor in enumerate(["Deltoid Sensor", "Pec Major Sensor", "Pec Minor Sensor", "Tricep (Long Head) Sensor", "Tricep (Lateral Head) Sensor"]):
-    axs[i].plot(session_df["Frame Number"], session_df[sensor], label=sensor, marker='o')
+    line, = axs[i].plot([], [], label=sensor, marker='o', markersize = 0)
+    axs[i].set_xlim(0, 300)
+    axs[i].set_ylim(0, 1000)
     axs[i].set_xlabel("Frame Number")
     axs[i].set_ylabel(sensor)
     axs[i].set_title(f"{sensor} vs Frame Number (Session File)")
     axs[i].grid(True)
     axs[i].legend()
+    lines.append(line)
+
+# Update function for animation
+def update(frame):
+    for i, sensor in enumerate(["Deltoid Sensor", "Pec Major Sensor", "Pec Minor Sensor", "Tricep (Long Head) Sensor", "Tricep (Lateral Head) Sensor"]):
+        lines[i].set_data(
+            session_df["Frame Number"][:frame],
+            session_df[sensor][:frame]
+        )
+    return lines
+
+# Number of frames and interval for animation
+fps = 3
+interval = 1000 // fps  # Interval in milliseconds
+frames = len(session_df)
+
+# Create the animation
+ani = FuncAnimation(fig, update, frames=frames, interval=interval, blit=True)
 
 plt.show()
-
