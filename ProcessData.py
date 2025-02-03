@@ -33,8 +33,9 @@ def createPoseData():
 
 def createSemgData():
     '''Given txt file from arduino serial output, creates semgData.npz file with semg data'''
-    # Main directory for sEMG data txt files
+    # Directories for files
     semgFolder = 'semg'
+    dataFolder = 'data'
     # Dictionary that stores np arrays for each session
     semgDataDict = {}
     # Get all the files within the semgFolder
@@ -61,13 +62,25 @@ def createSemgData():
         # Save session array in dict
         semgDataDict[sessionNum] = semgSessionData
     # Save all the arrays in a zipped numpy file
-    np.savez('data/semgData.npz', **semgDataDict)
+    np.savez(f'{dataFolder}/semgData.npz', **semgDataDict)
 
 #TODO
 def createVectorData():
     '''Given poseData.npz create vectorData.npz, a file with all unit vectors between points'''
+    # Directories for files
+    dataFolder = 'data'
     # Open poseData to obtain points to calculate vectors
-    poseDataDict = np.load('data/poseData.npz')
+    poseDataDict = np.load(f'{dataFolder}/poseData.npz')
+    # Dictionary to store all session data
+    vectorDataDict = {}
+    # Beginning and end index of points being used
+    minPoint, maxPoint = 1, 14
+    # Iterate through every session
+    for session in poseDataDict.files:
+        # Create empty np array for each session (105 Vectors with x, y, confidence)
+        vectorSessionData = np.empty(shape=[0,317])
+
+        
 
 #TODO
 def createCombinedData():
@@ -80,16 +93,16 @@ def createCombinedData():
 # -------------------------------- TESTING -------------------------------- #
 
 # Load poseData.npz and test
-# createPoseData()
+createPoseData()
 loaded_pose_data = np.load('data/poseData.npz')
 for file in loaded_pose_data.files:
     print(loaded_pose_data[file])
 
-# Load semgData.npz and test
+# # Load semgData.npz and test
 # createSemgData()
-loaded_semg_data = np.load('data/semgData.npz')
-for file in loaded_semg_data.files:
-    print(loaded_semg_data[file])
+# loaded_semg_data = np.load('data/semgData.npz')
+# for file in loaded_semg_data.files:
+#     print(loaded_semg_data[file])
 
 # # Load vectorData.npz and test
 # createVectorData()
