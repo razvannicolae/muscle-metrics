@@ -80,6 +80,7 @@ def createCombinedData():
 
 # -------------------------------- TESTING -------------------------------- #
 np.set_printoptions(threshold=np.inf)
+
 # Load poseData.npz and test
 createPoseData()
 loaded_pose_data = np.load('data/poseData.npz')

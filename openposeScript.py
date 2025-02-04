@@ -1,19 +1,19 @@
 import subprocess
 import os
 
-def run_openpose():
+def runOpenpose():
     # Directory containing videos
     videoFolder = "videos"
 
     # List all video files in the folder
-    video_list = os.listdir(videoFolder)
+    videoList = os.listdir(videoFolder)
 
-    for video in video_list:
+    for video in videoList:
         # Construct full path for each video
-        video_path = os.path.join(os.path.abspath(videoFolder), video)
+        videoPath = os.path.join(os.path.abspath(videoFolder), video)
 
         # Ensure paths are properly quoted
-        command = ["bin\OpenPoseDemo.exe", "--video", f"{video_path}", "--write_json", os.getcwd() + f"\pose\session{video_list.index(video)}"]
+        command = ["bin\OpenPoseDemo.exe", "--video", f"{videoPath}", "--write_json", os.getcwd() + f"\pose\session{videoList.index(video)}"]
         print(f"Running command: {' '.join(command)}")
 
         try:
@@ -23,4 +23,4 @@ def run_openpose():
         except subprocess.CalledProcessError as e:
             print(f"Error occurred while processing {video}: {e.stderr.decode('utf-8')}\n")
 
-run_openpose()
+runOpenpose()
