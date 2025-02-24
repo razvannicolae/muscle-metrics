@@ -81,6 +81,7 @@ def createVectorData():
         # Create empty np array for each session (105 Vectors with x, y, confidence)
         vectorSessionData = np.empty(shape=[0,317])
 
+
         
 
 #TODO
@@ -95,7 +96,6 @@ def createCombinedData():
 np.set_printoptions(threshold=np.inf)
 
 # Load poseData.npz and test
-createPoseData()
 createPoseData()
 loaded_pose_data = np.load('data/poseData.npz')
 for file in loaded_pose_data.files:
