@@ -23,7 +23,7 @@ def createPoseData():
             # Open JSON file to extract data
             with open(file_path, 'r') as json_file:
                 json_data = json.load(json_file)
-                frameNum = file[0:file.index('_')]
+                frameNum = file[(file.index('_') + 1):file.index('_k')]
                 # Append frame to poseData
                 poseData = np.vstack((poseData, [[sessionNum, int(frameNum)] + json_data['people'][0]['pose_keypoints_2d']])).astype(np.float64)
         # Once all of the frames have been added to poseData add the numpy array for the session to the dict
@@ -43,22 +43,23 @@ def createSemgData():
     # Iterate through every file (each file is one session)
     for file in files:
         # Create empty array for session
-        semgSessionData = np.empty(shape=[0,7])
+        semgSessionData = np.empty(shape=[0,8])
         sessionNum = file[7:file.index('.')]
         # Open file with reading permissions
         with open(f'{semgFolder}/{file}', 'r') as semgFile:
             # Get list of every line
-            lines = semgFile.readlines()
+            lines = semgFile.readlines()[1:]
             # Iterate through lines and get data
-            for i in range(0, len(lines), 6):
+            for i in range(0, len(lines), 7):
                 # Create an empty array for each frame
-                semgFrameData = np.empty(7)
+                semgFrameData = np.empty(8)
                 semgFrameData[0] = sessionNum
                 # Set each value in frame array to corresponding value
                 for j in range(6):
                     semgFrameData[j+1] = lines[i+j]
+                semgFrameData[7] = int(lines[i+6]) - 1
                 # Add frame array to 2d session array
-                semgSessionData = np.vstack((semgSessionData, semgFrameData)).astype(np.float64) 
+                semgSessionData = np.vstack((semgSessionData, semgFrameData)).astype(np.int32)
         # Save session array in dict
         semgDataDict[sessionNum] = semgSessionData
     # Save all the arrays in a zipped numpy file
@@ -91,8 +92,10 @@ def createCombinedData():
     
 
 # -------------------------------- TESTING -------------------------------- #
+np.set_printoptions(threshold=np.inf)
 
 # Load poseData.npz and test
+createPoseData()
 createPoseData()
 loaded_pose_data = np.load('data/poseData.npz')
 for file in loaded_pose_data.files:
