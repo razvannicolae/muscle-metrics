@@ -2,10 +2,13 @@ import numpy as np
 import json
 import os
 
-def createPoseData():
-    '''Given openPose JSON output, creates poseData.npz file with pose tracking data'''
-    # Main directory for openPose JSON Outputs
-    videoFolder = 'pose'
+def createPoseData(videoFolder: str = 'pose', dataFolder: str = 'data') -> None:
+    """Given openPose JSON output, creates poseData.npz file with pose tracking data
+
+    Args:
+        videoFolder (str, optional): folder where weightlifting videos are stored. Defaults to 'pose'.
+        dataFolder (str, optional): folder where .npz data files are stored. Defaults to 'data'.
+    """
     # Dictionary that stores all np arrays for each session
     poseDataDict = {}
     # List of subfolders from each session with individual frame JSON keypoints data
@@ -25,17 +28,19 @@ def createPoseData():
                 json_data = json.load(json_file)
                 frameNum = file[(file.index('_') + 1):file.index('_k')]
                 # Append frame to poseData
-                poseData = np.vstack((poseData, [[sessionNum, int(frameNum)] + json_data['people'][0]['pose_keypoints_2d']])).astype(np.float64)
+                poseData = np.vstack((poseData, [[sessionNum, int(frameNum)] + json_data['people'][0]['pose_keypoints_2d']])).astype(np.float32)
         # Once all of the frames have been added to poseData add the numpy array for the session to the dict
         poseDataDict[sessionNum] = poseData
     # Save all arrays for each recording session into a zipped numpy file
-    np.savez('data/poseData.npz', **poseDataDict)
+    np.savez(f'{dataFolder}/poseData.npz', **poseDataDict)
 
-def createSemgData():
-    '''Given txt file from arduino serial output, creates semgData.npz file with semg data'''
-    # Directories for files
-    semgFolder = 'semg'
-    dataFolder = 'data'
+def createSemgData(semgFolder: str = 'semg', dataFolder: str = 'data') -> None:
+    """Given txt file from arduino serial output, creates semgData.npz file with semg data
+
+    Args:
+        semgFolder (str, optional): folder where txt files with sEMG data are stored. Defaults to 'semg'.
+        dataFolder (str, optional): folder where .npz data files are stored. Defaults to 'data'.
+    """
     # Dictionary that stores np arrays for each session
     semgDataDict = {}
     # Get all the files within the semgFolder
@@ -65,11 +70,13 @@ def createSemgData():
     # Save all the arrays in a zipped numpy file
     np.savez(f'{dataFolder}/semgData.npz', **semgDataDict)
 
-#TODO
-def createVectorData():
-    '''Given poseData.npz create vectorData.npz, a file with all unit vectors between points'''
-    # Directories for files
-    dataFolder = 'data'
+# TODO
+def createVectorData(dataFolder: str = 'data') -> None:
+    """Given poseData.npz create vectorData.npz, a file with all unit vectors between points
+
+    Args:
+        dataFolder (str, optional): folder where .npz data files are stored. Defaults to 'data'.
+    """
     # Open poseData to obtain points to calculate vectors
     poseDataDict = np.load(f'{dataFolder}/poseData.npz')
     # Dictionary to store all session data
@@ -81,15 +88,16 @@ def createVectorData():
         # Create empty np array for each session (105 Vectors with x, y, confidence)
         vectorSessionData = np.empty(shape=[0,317])
 
+# TODO Remove any mention of session number and frame number from the data
+def createCombinedData(dataFolder: str = 'data') -> None:
+    """Given vectorData.npz and semgData.npz file, creates combinedData.npz file with synched data
 
-        
-
-#TODO
-def createCombinedData():
-    '''Given vectorData.npz and semgData.npz file, creates combinedData.npz file with synched data'''
+    Args:
+        dataFolder (str, optional): folder where .npz data files are stored. Defaults to 'data'.
+    """
     # Open vectorData and semgData
-    vectorDataDict = np.load('data/vectorData.npz')
-    semgDataDict = np.load('data/semgData.npz')
+    vectorDataDict = np.load(f'{dataFolder}/vectorData.npz')
+    semgDataDict = np.load(f'{dataFolder}/semgData.npz')
     
 
 # -------------------------------- TESTING -------------------------------- #
@@ -101,7 +109,7 @@ loaded_pose_data = np.load('data/poseData.npz')
 for file in loaded_pose_data.files:
     print(loaded_pose_data[file])
 
-# # Load semgData.npz and test
+# Load semgData.npz and test
 # createSemgData()
 # loaded_semg_data = np.load('data/semgData.npz')
 # for file in loaded_semg_data.files:
