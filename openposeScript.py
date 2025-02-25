@@ -27,4 +27,5 @@ def runOpenpose(videoFolder: str = "videos", poseFolder: str = "pose") -> None:
         except subprocess.CalledProcessError as e:
             print(f"Error occurred while processing {video}: {e.stderr.decode('utf-8')}\n")
 
-runOpenpose()
+if __name__ == "__main__":
+    runOpenpose()

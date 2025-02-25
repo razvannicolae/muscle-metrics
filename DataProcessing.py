@@ -101,28 +101,30 @@ def createCombinedData(dataFolder: str = 'data') -> None:
     
 
 # -------------------------------- TESTING -------------------------------- #
-np.set_printoptions(threshold=np.inf)
+if __name__ == '__main__':
+    
+    np.set_printoptions(threshold=np.inf)
 
-# Load poseData.npz and test
-createPoseData()
-loaded_pose_data = np.load('data/poseData.npz')
-for file in loaded_pose_data.files:
-    print(loaded_pose_data[file])
+    # Load poseData.npz and test
+    createPoseData()
+    loaded_pose_data = np.load('data/poseData.npz')
+    for file in loaded_pose_data.files:
+        print(loaded_pose_data[file])
 
-# Load semgData.npz and test
-# createSemgData()
-# loaded_semg_data = np.load('data/semgData.npz')
-# for file in loaded_semg_data.files:
-#     print(loaded_semg_data[file])
+    # Load semgData.npz and test
+    # createSemgData()
+    # loaded_semg_data = np.load('data/semgData.npz')
+    # for file in loaded_semg_data.files:
+    #     print(loaded_semg_data[file])
 
-# # Load vectorData.npz and test
-# createVectorData()
-# loaded_vector_data = np.load('data/vectorData.npz')
-# for file in loaded_vector_data.files:
-#     print(loaded_vector_data[file])
+    # # Load vectorData.npz and test
+    # createVectorData()
+    # loaded_vector_data = np.load('data/vectorData.npz')
+    # for file in loaded_vector_data.files:
+    #     print(loaded_vector_data[file])
 
-# # Load combinedData.npz and test
-# createCombinedData()
-# loaded_combined_data = np.load('data/combinedData.npz')
-# for file in loaded_combined_data.files:
-#     print(loaded_combined_data[file])
+    # # Load combinedData.npz and test
+    # createCombinedData()
+    # loaded_combined_data = np.load('data/combinedData.npz')
+    # for file in loaded_combined_data.files:
+    #     print(loaded_combined_data[file])
