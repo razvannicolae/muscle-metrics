@@ -7,7 +7,7 @@ def createPoseData(videoFolder: str = 'pose', dataFolder: str = 'data') -> None:
 
     Args:
         videoFolder (str, optional): folder where weightlifting videos are stored. Defaults to 'pose'.
-        dataFolder (str, optional): folder where .npz data files are stored. Defaults to 'data'.
+        dataFolder (str, optional): folder where created poseData.npz data file is saved. Defaults to 'data'.
     """
     # Dictionary that stores all np arrays for each session
     poseDataDict = {}
@@ -64,7 +64,7 @@ def createSemgData(semgFolder: str = 'semg', dataFolder: str = 'data') -> None:
                     semgFrameData[j+1] = lines[i+j]
                 semgFrameData[7] = int(lines[i+6]) - 1
                 # Add frame array to 2d session array
-                semgSessionData = np.vstack((semgSessionData, semgFrameData)).astype(np.int32)
+                semgSessionData = np.vstack((semgSessionData, semgFrameData)).astype(np.float32)
         # Save session array in dict
         semgDataDict[sessionNum] = semgSessionData
     # Save all the arrays in a zipped numpy file
@@ -87,7 +87,29 @@ def createVectorData(dataFolder: str = 'data') -> None:
     for session in poseDataDict.files:
         # Create empty np array for each session (105 Vectors with x, y, confidence)
         vectorSessionData = np.empty(shape=[0,317])
-
+        for frame in poseDataDict[session]:
+            # Create empty np array for each frame (session, frame, 105 vectors)
+            vectorFrameData = np.empty(317)
+            vectorFrameData[:2] = frame[:2]
+            # Iterate through every point
+            for firstPoint in range(minPoint, maxPoint - 1):
+                for secondPoint in range(firstPoint + 1, maxPoint):
+                    # Calculate the vector between the two points
+                    x = frame[2+firstPoint*3] - frame[2+secondPoint*3]
+                    y = frame[2+firstPoint*3 + 1] - frame[2+secondPoint*3 + 1]
+                    # Normalize the vector
+                    magnitude = np.sqrt(x**2 + y**2)
+                    if magnitude != 0:
+                        x /= magnitude
+                        y /= magnitude
+                    confidence = (frame[2+firstPoint*3 + 2] + frame[2+secondPoint*3 + 2]) / 2
+                    # Add the vector to the frame array
+    
+        # Save the session data in the dictionary
+        vectorDataDict[session] = vectorSessionData
+    # Save all the arrays in a zipped numpy file
+    np.savez(f'{dataFolder}/vectorData.npz', **vectorDataDict)
+    
 # TODO Remove any mention of session number and frame number from the data
 def createCombinedData(dataFolder: str = 'data') -> None:
     """Given vectorData.npz and semgData.npz file, creates combinedData.npz file with synched data
@@ -99,29 +121,27 @@ def createCombinedData(dataFolder: str = 'data') -> None:
     vectorDataDict = np.load(f'{dataFolder}/vectorData.npz')
     semgDataDict = np.load(f'{dataFolder}/semgData.npz')
     
-
-# -------------------------------- TESTING -------------------------------- #
 if __name__ == '__main__':
-    
     np.set_printoptions(threshold=np.inf)
 
-    # Load poseData.npz and test
-    createPoseData()
-    loaded_pose_data = np.load('data/poseData.npz')
-    for file in loaded_pose_data.files:
-        print(loaded_pose_data[file])
+    # # Load poseData.npz and test
+    # createPoseData()
+    # loaded_pose_data = np.load('data/poseData.npz')
+    # for file in loaded_pose_data.files:
+    #     print(loaded_pose_data[file])
+    # print(loaded_pose_data.shape)
 
-    # Load semgData.npz and test
+    # # Load semgData.npz and test
     # createSemgData()
     # loaded_semg_data = np.load('data/semgData.npz')
     # for file in loaded_semg_data.files:
     #     print(loaded_semg_data[file])
 
-    # # Load vectorData.npz and test
-    # createVectorData()
-    # loaded_vector_data = np.load('data/vectorData.npz')
-    # for file in loaded_vector_data.files:
-    #     print(loaded_vector_data[file])
+    # Load vectorData.npz and test
+    createVectorData()
+    loaded_vector_data = np.load('data/vectorData.npz')
+    for file in loaded_vector_data.files:
+        print(loaded_vector_data[file])
 
     # # Load combinedData.npz and test
     # createCombinedData()
