@@ -79,32 +79,39 @@ def create_vector_data(data_folder: str = 'data') -> None:
     # Dictionary to store all session data
     vector_data_dict = {}
     # Beginning and end index of points being used
-    min_point, max_point = 1, 14
+    points = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13]
     # Iterate through every session
     for session in pose_data_dict.files:
-        # Create empty np array for each session (105 Vectors with x, y, confidence)
-        vector_session_data = np.empty(shape=[0,317])
+        # Create empty np array for each session (78 Vectors with x, y, confidence)
+        vector_session_data = np.empty(shape=[0,236])
         for frame in pose_data_dict[session]:
-            # Create empty np array for each frame (session, frame, 105 vectors)
-            vector_frame_data = np.empty(317)
+            # Create empty np array for each frame (session, frame, 78 vectors)
+            vector_frame_data = np.empty(236)
             vector_frame_data[:2] = frame[:2]
             vector_index = 0
             # Iterate through every point
-            for first_point in range(min_point, max_point - 1):
-                for second_point in range(first_point + 1, max_point):
-                    # Calculate the vector between the two points
-                    x = frame[2+first_point*3] - frame[2+second_point*3]
-                    y = frame[2+first_point*3 + 1] - frame[2+second_point*3 + 1]
-                    # Normalize the vector
-                    magnitude = np.sqrt(x**2 + y**2)
-                    x /= magnitude if magnitude < 1 and x != 0 else 0
-                    y /= magnitude if magnitude < 1 and y != 0 else 0
-                    confidence = (frame[2+first_point*3 + 2] + frame[2+second_point*3 + 2]) / 2
-                    # Add the vector to the frame array
-                    vector_frame_data[2+vector_index: 5 + vector_index] = [x, y, confidence]
+            for idx, first_point in enumerate(points[:-1]):
+                for second_point in points[idx+1:]:
+                    x1, x2 = frame[2+first_point*3], frame[2+second_point*3] #
+                    y1, y2 = frame[2+first_point*3 + 1], frame[2+second_point*3 + 1]
+                    c1, c2 = frame[2+first_point*3 + 2], frame[2+second_point*3 + 2]
+                    if not any(0 <= num <= 1 for num in [x1, x2, y1, y2]) and not 0 in [c1, c2]:
+                        x = x1 - x2
+                        y = y1 - y2
+                        # Normalize the vector
+                        magnitude = np.sqrt(x**2 + y**2)
+                        if magnitude > 1:
+                            x /= magnitude
+                            y /= magnitude
+                            confidence = (c1 + c2) / 2
+                        else: x, y, confidence = 0, 0, 0
+                        # Add the vector to the frame array
+                        vector_frame_data[2+vector_index: 5 + vector_index] = [x, y, confidence]
+                    else:
+                        vector_frame_data[2+vector_index: 5 + vector_index] = [0, 0, 0]
                     vector_index += 3
             # Add the frame array to the session array
-            vector_session_data = np.vstack((vector_session_data, vector_frame_data)).astype(np.float32)
+            vector_session_data = np.vstack((vector_session_data, vector_frame_data))
         # Save the session data in the dictionary
         vector_data_dict[session] = vector_session_data
     # Save all the arrays in a zipped numpy file
@@ -115,9 +122,9 @@ if __name__ == '__main__':
 
     # # Load pose_data.npz and test
     # create_pose_data()
-    # loaded_pose_data = np.load('data/pose_data.npz')
-    # for file in loaded_pose_data.files:
-    #     print(loaded_pose_data[file])
+    loaded_pose_data = np.load('data/pose_data.npz')
+    for file in loaded_pose_data.files:
+        print(loaded_pose_data[file][1627])
 
     # # Load semg_data.npz and test
     # create_semg_data()
@@ -129,4 +136,4 @@ if __name__ == '__main__':
     # create_vector_data()
     loaded_vector_data = np.load('data/vector_data.npz')
     for file in loaded_vector_data.files:
-        print(loaded_vector_data[file])
+        print(loaded_vector_data[file][1627])
