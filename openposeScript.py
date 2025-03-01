@@ -3,7 +3,6 @@ import os
 
 def run_openpose(video_folder: str = "videos", pose_folder: str = "pose") -> None:
     """Run Openpose on all videos in the video folder and save the pose data in the pose folder
-
     Args:
         videoFolder (str, optional): folder where weightlifting videos are stored. Defaults to "videos".
         poseFolder (str, optional): folder where JSON pose output files are saved to. Defaults to "pose".

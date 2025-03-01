@@ -5,9 +5,9 @@ import os
 
 def animated_graph(session_file_name: str, graph_folder: str = "graphs") -> None:
     """Animates the sensor data for all five muscles for one session file
-
     Args:
         session_file_name (str): path to the session file
+        graph_folder (str, optional): folder to save the animated graph. Defaults to "graphs".
     """
     # Read the session file
     with open(session_file_name, 'r') as file:
