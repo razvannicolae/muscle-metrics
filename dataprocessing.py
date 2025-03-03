@@ -78,24 +78,25 @@ def create_vector_data(data_folder: str = 'data') -> None:
     pose_data_dict = np.load(f'{data_folder}/pose_data.npz')
     # Dictionary to store all session data
     vector_data_dict = {}
-    # Beginning and end index of points being used
-    points = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13]
+    # Beginning and end index of points being used (index is -1 compared to openpose graphic to account for array indexing)
+    points = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12]
     # Iterate through every session
     for session in pose_data_dict.files:
         # Create empty np array for each session (78 Vectors with x, y, confidence)
-        vector_session_data = np.empty(shape=[0,236])
+        vector_session_data = np.empty(shape=[0,200])
         for frame in pose_data_dict[session]:
             # Create empty np array for each frame (session, frame, 78 vectors)
-            vector_frame_data = np.empty(236)
+            vector_frame_data = np.empty(200)
             vector_frame_data[:2] = frame[:2]
             vector_index = 0
             # Iterate through every point
             for idx, first_point in enumerate(points[:-1]):
                 for second_point in points[idx+1:]:
-                    x1, x2 = frame[2+first_point*3], frame[2+second_point*3] #
-                    y1, y2 = frame[2+first_point*3 + 1], frame[2+second_point*3 + 1]
-                    c1, c2 = frame[2+first_point*3 + 2], frame[2+second_point*3 + 2]
-                    if not any(0 <= num <= 1 for num in [x1, x2, y1, y2]) and not 0 in [c1, c2]:
+                    x1, x2 = frame[2+first_point*3], frame[2+second_point*3] # Get x values
+                    y1, y2 = frame[2+first_point*3 + 1], frame[2+second_point*3 + 1] # Get y values
+                    c1, c2 = frame[2+first_point*3 + 2], frame[2+second_point*3 + 2] # Get confidence values
+                    # Check if points are valid
+                    if not 0 in [x1, x2, y1, y2, c1, c2]:
                         x = x1 - x2
                         y = y1 - y2
                         # Normalize the vector
@@ -112,19 +113,22 @@ def create_vector_data(data_folder: str = 'data') -> None:
                     vector_index += 3
             # Add the frame array to the session array
             vector_session_data = np.vstack((vector_session_data, vector_frame_data))
+            # Replace small values with 0
+            vector_session_data = np.nan_to_num(vector_session_data, nan = 0, posinf = None, neginf = None)
         # Save the session data in the dictionary
         vector_data_dict[session] = vector_session_data
     # Save all the arrays in a zipped numpy file
     np.savez(f'{data_folder}/vector_data.npz', **vector_data_dict)
-    
+
+# Testing the functions
 if __name__ == '__main__':
     np.set_printoptions(threshold=np.inf)
 
     # # Load pose_data.npz and test
     # create_pose_data()
-    loaded_pose_data = np.load('data/pose_data.npz')
-    for file in loaded_pose_data.files:
-        print(loaded_pose_data[file][1627])
+    # loaded_pose_data = np.load('data/pose_data.npz')
+    # for file in loaded_pose_data.files:
+    #     print(loaded_pose_data[file][1627][:41])
 
     # # Load semg_data.npz and test
     # create_semg_data()
@@ -133,7 +137,7 @@ if __name__ == '__main__':
     #     print(loaded_semg_data[file])
 
     # Load vectorData.npz and test
-    # create_vector_data()
+    create_vector_data()
     loaded_vector_data = np.load('data/vector_data.npz')
     for file in loaded_vector_data.files:
         print(loaded_vector_data[file][1627])

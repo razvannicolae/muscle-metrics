@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import os
 
-def animated_graph(session_file_name: str, graph_folder: str = "graphs") -> None:
+def display_animated_graph(session_file_name: str, graph_folder: str = "graphs") -> None:
     """Animates the sensor data for all five muscles for one session file
     Args:
         session_file_name (str): path to the session file
@@ -80,4 +80,4 @@ def animated_graph(session_file_name: str, graph_folder: str = "graphs") -> None
 if __name__ == "__main__":
     semg_folder = 'semg'
     for semg_file in os.listdir(semg_folder):
-        animated_graph(f'{semg_folder}/{semg_file}')
+        display_animated_graph(f'{semg_folder}/{semg_file}')
