@@ -82,10 +82,10 @@ def create_vector_data(data_folder: str = 'data') -> None:
     points = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12]
     # Iterate through every session
     for session in pose_data_dict.files:
-        # Create empty np array for each session (78 Vectors with x, y, confidence)
+        # Create empty np array for each session (66 Vectors with x, y, confidence)
         vector_session_data = np.empty(shape=[0,200])
         for frame in pose_data_dict[session]:
-            # Create empty np array for each frame (session, frame, 78 vectors)
+            # Create empty np array for each frame (session, frame, 66 vectors)
             vector_frame_data = np.empty(200)
             vector_frame_data[:2] = frame[:2]
             vector_index = 0
@@ -128,7 +128,7 @@ if __name__ == '__main__':
     # create_pose_data()
     # loaded_pose_data = np.load('data/pose_data.npz')
     # for file in loaded_pose_data.files:
-    #     print(loaded_pose_data[file][1627][:41])
+    #     print(loaded_pose_data[file])
 
     # # Load semg_data.npz and test
     # create_semg_data()
@@ -140,4 +140,4 @@ if __name__ == '__main__':
     create_vector_data()
     loaded_vector_data = np.load('data/vector_data.npz')
     for file in loaded_vector_data.files:
-        print(loaded_vector_data[file][1627])
+        print(loaded_vector_data[file])
