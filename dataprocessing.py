@@ -78,8 +78,8 @@ def create_vector_data(data_folder: str = 'data') -> None:
     pose_data_dict = np.load(f'{data_folder}/pose_data.npz')
     # Dictionary to store all session data
     vector_data_dict = {}
-    # Beginning and end index of points being used (index is -1 compared to openpose graphic to account for array indexing)
-    points = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12]
+    # points = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13] (point # on openPose)
+    point_indexes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12]
     # Iterate through every session
     for session in pose_data_dict.files:
         # Create empty np array for each session (66 Vectors with x, y, confidence)
@@ -90,8 +90,8 @@ def create_vector_data(data_folder: str = 'data') -> None:
             vector_frame_data[:2] = frame[:2]
             vector_index = 0
             # Iterate through every point
-            for idx, first_point in enumerate(points[:-1]):
-                for second_point in points[idx+1:]:
+            for idx, first_point in enumerate(point_indexes[:-1]):
+                for second_point in point_indexes[idx+1:]:
                     x1, x2 = frame[2+first_point*3], frame[2+second_point*3] # Get x values
                     y1, y2 = frame[2+first_point*3 + 1], frame[2+second_point*3 + 1] # Get y values
                     c1, c2 = frame[2+first_point*3 + 2], frame[2+second_point*3 + 2] # Get confidence values
@@ -140,4 +140,4 @@ if __name__ == '__main__':
     create_vector_data()
     loaded_vector_data = np.load('data/vector_data.npz')
     for file in loaded_vector_data.files:
-        print(loaded_vector_data[file])
+        print(loaded_vector_data[file][1627])
