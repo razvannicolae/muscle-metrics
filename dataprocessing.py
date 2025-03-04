@@ -68,7 +68,6 @@ def create_semg_data(semg_folder: str = 'semg', data_folder: str = 'data') -> No
     # Save all the arrays in a zipped numpy file
     np.savez(f'{data_folder}/semg_data.npz', **semg_data_dict)
 
-# TODO
 def create_vector_data(data_folder: str = 'data') -> None:
     """Given pose_data.npz create vector_data.npz, a file with all unit vectors between points
     Args:
@@ -79,7 +78,7 @@ def create_vector_data(data_folder: str = 'data') -> None:
     # Dictionary to store all session data
     vector_data_dict = {}
     # points = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13] (point # on openPose)
-    point_indexes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12]
+    point_indexes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12] # adjusted for array indexing
     # Iterate through every session
     for session in pose_data_dict.files:
         # Create empty np array for each session (66 Vectors with x, y, confidence)
