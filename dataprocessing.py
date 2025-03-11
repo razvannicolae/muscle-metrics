@@ -107,8 +107,7 @@ def create_vector_data(data_folder: str = 'data') -> None:
                         else: x, y, confidence = 0, 0, 0
                         # Add the vector to the frame array
                         vector_frame_data[2+vector_index: 5 + vector_index] = [x, y, confidence]
-                    else:
-                        vector_frame_data[2+vector_index: 5 + vector_index] = [0, 0, 0]
+                    else: vector_frame_data[2+vector_index: 5 + vector_index] = [0, 0, 0]
                     vector_index += 3
             # Add the frame array to the session array
             vector_session_data = np.vstack((vector_session_data, vector_frame_data))
@@ -121,22 +120,6 @@ def create_vector_data(data_folder: str = 'data') -> None:
 
 # Testing the functions
 if __name__ == '__main__':
-    np.set_printoptions(threshold=np.inf)
-
-    # # Load pose_data.npz and test
-    # create_pose_data()
-    # loaded_pose_data = np.load('data/pose_data.npz')
-    # for file in loaded_pose_data.files:
-    #     print(loaded_pose_data[file])
-
-    # # Load semg_data.npz and test
-    # create_semg_data()
-    # loaded_semg_data = np.load('data/semg_data.npz')
-    # for file in loaded_semg_data.files:
-    #     print(loaded_semg_data[file])
-
-    # Load vectorData.npz and test
+    create_pose_data()
+    create_semg_data()
     create_vector_data()
-    loaded_vector_data = np.load('data/vector_data.npz')
-    for file in loaded_vector_data.files:
-        print(loaded_vector_data[file][1627])

@@ -1,1 +1,1 @@
-<h1>Muscle Metrics: Enhancing Dumbbell Press Insights through Pose Tracking and sEMG Readings</h1>
+<h1>Muscle Metrics: Estimating Trends in Myoelectric Activity Using Computer Vision and Machine Learning to Improve Weightlifting Form</h1>
