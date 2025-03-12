@@ -55,7 +55,7 @@ def display_animated_graph(session_file_path: str) -> None:
         axs[i].set_ylim(0, 1000)
         axs[i].set_xlabel("Frame Number")
         axs[i].set_ylabel(sensor)
-        axs[i].set_title(f"{sensor} vs Frame Number (Session File)")
+        axs[i].set_title(f"{sensor} vs Frame Number")
         axs[i].grid(True)
         axs[i].legend()
         lines.append(line)

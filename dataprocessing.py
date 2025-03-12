@@ -68,6 +68,22 @@ def create_semg_data(semg_folder: str = 'semg', data_folder: str = 'data') -> No
     # Save all the arrays in a zipped numpy file
     np.savez(f'{data_folder}/semg_data.npz', **semg_data_dict)
 
+def create_classification_data(file_name: str = "classification.json" ) -> None:
+    """Creates a numpy zipped file with form classification data for second model
+    Args:
+        file_name (str, optional): file path for json dictionary file. Defaults to "classification.json":str.
+    """
+    # Open JSON file to extract data
+    with open(file_name, 'r') as json_file:
+        classification_data = json.load(json_file)
+    # Create empty numpy array to append data to
+    classification_np = np.empty(shape=[0, 3])
+    # Iterate through all the data in the JSON file
+    for session in classification_data:
+        classification_np = np.vstack((classification_np, [session, 1 if classification_data[session] == "proper" else 0, 1 if classification_data[session] == "poor" else 0]))
+    # Save the numpy array into a zipped numpy file
+    np.savez('data/classification_data.npz', classification_np)
+
 def create_vector_data(data_folder: str = 'data') -> None:
     """Given pose_data.npz create vector_data.npz, a file with all unit vectors between points
     Args:
@@ -118,7 +134,6 @@ def create_vector_data(data_folder: str = 'data') -> None:
     # Save all the arrays in a zipped numpy file
     np.savez(f'{data_folder}/vector_data.npz', **vector_data_dict)
 
-# Testing the functions
 if __name__ == '__main__':
     create_pose_data()
     create_semg_data()
