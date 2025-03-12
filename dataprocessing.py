@@ -80,7 +80,7 @@ def create_classification_data(file_name: str = "classification.json" ) -> None:
     classification_np = np.empty(shape=[0, 3])
     # Iterate through all the data in the JSON file
     for session in classification_data:
-        classification_np = np.vstack((classification_np, [session, 1 if classification_data[session] == "proper" else 0, 1 if classification_data[session] == "poor" else 0]))
+        classification_np = np.vstack((classification_np, [session, 1 if classification_data[session] == "proper" else 0, 1 if classification_data[session] == "poor" else 0])).astype(np.int8)
     # Save the numpy array into a zipped numpy file
     np.savez('data/classification_data.npz', classification_np)
 

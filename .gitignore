@@ -16,3 +16,5 @@ LICENSE
 Version.txt
 .env
 testing.py
+classification.json
+__pycache__/
