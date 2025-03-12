@@ -137,4 +137,5 @@ def create_vector_data(data_folder: str = 'data') -> None:
 if __name__ == '__main__':
     create_pose_data()
     create_semg_data()
+    create_classification_data()
     create_vector_data()
