@@ -29,15 +29,15 @@ class PoseSemgDataset(Dataset):
        
         # Extract relevant columns:
         # For pose: columns 2 to 76 → 75 features per frame.
-        pose_session = pose_session[0:300, 2:77]  # shape: (300, 75)
+        pose_session = pose_session[0:300, 2:200]  # shape: (300, 75)
         # For SEMG: column 0 → 1 sensor value per frame.
-        semg_session = semg_session[0:300, 1:2]   # shape: (300, 1)
+        semg_session = semg_session[0:300, 5:6]   # shape: (300, 1)
 
         if pose_session.shape[0] != self.num_frames or semg_session.shape[0] != self.num_frames:
             raise ValueError(f"Session {session_key} does not have {self.num_frames} frames.")
        
         # Reshape pose data: (300, 75) -> (fps, duration, 75) -> then transpose to (75, fps, duration)
-        pose_session = pose_session.reshape(self.fps, self.duration, 75).transpose(2, 0, 1)
+        pose_session = pose_session.reshape(self.fps, self.duration, 198).transpose(2, 0, 1)
        
         # Reshape SEMG data: (300, 1) -> (fps, duration, 1)
         semg_session = semg_session.reshape(self.fps, self.duration, 1)
@@ -56,15 +56,15 @@ class EMGEstimator(nn.Module):
         super(EMGEstimator, self).__init__()
         # Input: (batch, 75, 30, 10)
         # Convolve over the fps dimension (30 frames per second) with kernel size (30, 1)
-        self.conv = nn.Conv2d(in_channels=75, out_channels=75, kernel_size=(30, 1))
+        self.conv = nn.Conv2d(in_channels=198, out_channels=198, kernel_size=(30, 1))
         # After conv: shape becomes (batch, 75, 1, 10) → squeeze to (batch, 75, 10)
         # Flattened feature size: 75 * 10 = 750
-        self.fc_in = nn.Linear(750, 64)
-        self.fc_2 = nn.Linear(64, 64)
-        self.fc_3 = nn.Linear(64, 64)
-        self.fc_4 = nn.Linear(64, 64)
+        self.fc_in = nn.Linear(1980, 128)
+        self.fc_2 = nn.Linear(128, 128)
+        self.fc_3 = nn.Linear(128, 128)
+        self.fc_4 = nn.Linear(128, 128)
         # Final layer: Output shape = 30 (fps) * 10 (seconds) * 1 (sensor) = 300
-        self.fc_out = nn.Linear(64, 300)
+        self.fc_out = nn.Linear(128, 300)
    
     def forward(self, x):
         x = self.conv(x)         # -> (batch, 75, 1, 10)
@@ -81,8 +81,8 @@ class EMGEstimator(nn.Module):
 # ---------------------------
 # Data Preparation and Split
 # ---------------------------
-pose_file = 'data\poseData.npz'
-semg_file = 'data\semgData.npz'
+pose_file = 'data\\vector_data.npz'
+semg_file = 'data\semg_data.npz'
 dataset = PoseSemgDataset(pose_file, semg_file)
 
 # Split dataset into 70% training, 15% validation, 20% testing
@@ -107,7 +107,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = EMGEstimator().to(device)
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-num_epochs = 50
+num_epochs = 2
 
 train_losses = []
 val_losses = []
@@ -146,6 +146,7 @@ for epoch in range(num_epochs):
 # ---------------------------
 # Testing Phase
 # ---------------------------
+# Testing Phase
 model.eval()
 running_test_loss = 0.0
 with torch.no_grad():
@@ -155,20 +156,47 @@ with torch.no_grad():
         loss = criterion(outputs, semg_tensor)
         running_test_loss += loss.item()
 avg_test_loss = running_test_loss / len(test_loader)
-print(f"Test Loss: {avg_test_loss:.4f}")
+avg_test_rmse = np.sqrt(avg_test_loss)
+print(f"Test Loss: {avg_test_loss:.4f} - Test RMSE: {avg_test_rmse:.4f}")
 
 # ---------------------------
 # Plotting Loss Curves
 # ---------------------------
-plt.figure(figsize=(10, 5))
-plt.plot(train_losses, label="Train Loss")
-plt.plot(val_losses, label="Validation Loss")
-plt.xlabel("Epoch")
-plt.ylabel("Loss")
-plt.legend()
-plt.title("Training and Validation Loss Over Epochs")
-plt.show()
+# plt.figure(figsize=(10, 5))
+# plt.plot(train_losses, label="Train Loss")
+# plt.plot(val_losses, label="Validation Loss")
+# plt.xlabel("Epoch")
+# plt.ylabel("Loss")
+# plt.legend()
+# plt.title("Training and Validation Loss Over Epochs")
+# plt.show()
     
+sample_pose, sample_semg = next(iter(test_loader))
+sample_pose = sample_pose.to(device)
+model.eval()
+with torch.no_grad():
+    sample_pred = model(sample_pose)
+   
+# sample_pred and sample_semg shape: (1, 30, 10, 1)
+# Flatten the time dimensions to get a (300,) array.
+sample_pred = sample_pred.cpu().view(-1, 1).numpy()   # shape: (300, 1)
+sample_semg = sample_semg.cpu().view(-1, 1).numpy()     # shape: (300, 1)
+
+# Create a time axis (0 to 299)
+time_steps = range(sample_pred.shape[0])
+
+# Plot ground truth vs predicted for the one sensor.
+plt.figure(figsize=(12, 4))
+plt.plot(time_steps, sample_semg[:, 0], label="Ground Truth", color="blue")
+plt.plot(time_steps, sample_pred[:, 0], label="Predicted", color="red", linestyle="--")
+plt.title("SEMG Sensor: Ground Truth vs Prediction")
+plt.xlabel("Frame")
+plt.ylabel("Sensor Value")
+plt.legend()
+plt.tight_layout()
+plt.show()
+
+
 
 torch.save(model.state_dict(), 'emg_estimator_model_10sec_1sensor.pth')
 print("Model saved as emg_estimator_model_10sec_1sensor.pth")
