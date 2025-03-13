@@ -81,8 +81,8 @@ class EMGEstimator(nn.Module):
 # ---------------------------
 # Data Preparation and Split
 # ---------------------------
-pose_file = 'data\poseData.npz'
-semg_file = 'data\semgData.npz'
+pose_file = 'data\pose_data.npz'
+semg_file = 'data\semg_data.npz'
 dataset = PoseSemgDataset(pose_file, semg_file)
 
 # Split dataset into 70% training, 15% validation, 20% testing
@@ -170,5 +170,5 @@ plt.title("Training and Validation Loss Over Epochs")
 plt.show()
     
 
-torch.save(model.state_dict(), 'emg_estimator_model_10sec_1sensor.pth')
+torch.save(model.state_dict(), 'saved_models/emg_estimator_model_10sec_1sensor.pth')
 print("Model saved as emg_estimator_model_10sec_1sensor.pth")

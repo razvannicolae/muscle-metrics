@@ -97,6 +97,20 @@ val_losses = []
 train_accuracies = []
 val_accuracies = []
 
+# Function to apply winner-takes-all to predictions
+def winner_takes_all(predictions) -> torch.Tensor:
+
+    # Get indices of maximum values along dimension 1
+    max_indices = torch.argmax(predictions, dim=1, keepdim=True)
+    
+    # Create a tensor of zeros with the same shape as predictions
+    one_hot = torch.zeros_like(predictions)
+    
+    # Set the maximum value positions to 1
+    one_hot.scatter_(1, max_indices, 1.0)
+    
+    return one_hot
+
 for epoch in range(num_epochs):
     # Training Phase
     model.train()
@@ -113,7 +127,7 @@ for epoch in range(num_epochs):
         optimizer.step()
         
         running_train_loss += loss.item()
-        predictions = (outputs > 0.5).float()
+        predictions = winner_takes_all(outputs)
         correct_train += (predictions == class_tensor).all(dim=1).sum().item()
         total_train += class_tensor.size(0)
     
@@ -133,7 +147,7 @@ for epoch in range(num_epochs):
             loss = criterion(outputs, class_tensor)
             running_val_loss += loss.item()
             
-            predictions = (outputs > 0.5).float()
+            predictions = winner_takes_all(outputs)
             correct_val += (predictions == class_tensor).all(dim=1).sum().item()
             total_val += class_tensor.size(0)
     
@@ -142,11 +156,6 @@ for epoch in range(num_epochs):
     val_accuracies.append(val_acc)
     
     print(f"Epoch {epoch+1}/{num_epochs} - Train Loss: {train_losses[-1]:.4f} - Train Acc: {train_acc:.4f} - Val Loss: {val_losses[-1]:.4f} - Val Acc: {val_acc:.4f}")
-
-# ---------------------------
-# Testing Phase
-# ---------------------------
-from sklearn.metrics import precision_score, recall_score, f1_score
 
 # ---------------------------
 # Testing Phase
@@ -165,13 +174,13 @@ with torch.no_grad():
         loss = criterion(outputs, class_tensor)
         running_test_loss += loss.item()
 
-        predictions = (outputs > 0.5).float()
+        predictions = winner_takes_all(outputs)
         all_predictions.append(predictions.cpu().numpy())
         all_labels.append(class_tensor.cpu().numpy())
         
         correct_test += (predictions == class_tensor).all(dim=1).sum().item()
         total_test += class_tensor.size(0)
-        print(f"Epoch {epoch+1}: Sample Predictions: {predictions[:5]} | True Labels: {class_tensor[:5]}")
+        print(f"Epoch {epoch+1}: Sample Predictions: {predictions} | True Labels: {class_tensor}")
 
 
 # Flatten the lists for precision, recall, and F1 calculation
@@ -193,5 +202,5 @@ print(f"F1-Score: {f1:.4f}")
 # ---------------------------
 # Save Model
 # ---------------------------
-torch.save(model.state_dict(), 'emg_form_classifier.pth')
+torch.save(model.state_dict(), 'saved_models/emg_form_classifier.pth')
 print("Model saved as emg_form_classifier.pth")
