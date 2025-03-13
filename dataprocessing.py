@@ -60,7 +60,10 @@ def create_semg_data(semg_folder: str = 'semg', data_folder: str = 'data') -> No
                 # Set each value in frame array to corresponding value
                 for j in range(6):
                     semg_frame_data[j+1] = lines[i+j]
-                semg_frame_data[7] = int(lines[i+6]) - 1
+                if int(session_num) <= 14:
+                    semg_frame_data[7] = int(lines[i+6]) - 1
+                else:
+                    semg_frame_data[7] = int(lines[i+6])                    
                 # Add frame array to 2d session array
                 semg_session_data = np.vstack((semg_session_data, semg_frame_data)).astype(np.float32)
         # Save session array in dict
@@ -80,7 +83,7 @@ def create_classification_data(file_name: str = "classification.json" ) -> None:
     classification_np = np.empty(shape=[0, 3])
     # Iterate through all the data in the JSON file
     for session in classification_data:
-        classification_np = np.vstack((classification_np, [session, 1 if classification_data[session] == "proper" else 0, 1 if classification_data[session] == "poor" else 0])).astype(np.int8)
+        classification_np = np.vstack((classification_np, [session, 1 if classification_data[session] == 1 else 0, 1 if classification_data[session] == 0 else 0])).astype(np.int8)
     # Save the numpy array into a zipped numpy file
     np.savez('data/classification_data.npz', classification_np)
 
@@ -135,6 +138,4 @@ def create_vector_data(data_folder: str = 'data') -> None:
     np.savez(f'{data_folder}/vector_data.npz', **vector_data_dict)
 
 if __name__ == '__main__':
-    create_pose_data()
-    create_semg_data()
-    create_vector_data()
+    create_classification_data()
