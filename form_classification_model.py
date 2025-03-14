@@ -88,6 +88,50 @@ labels = dataset.classification_data[:, 1:3]
 class_counts = labels.sum(axis=0)
 class_weights = torch.tensor(1.0 / class_counts, dtype=torch.float32).to(device)
 
+# ---------------------------
+# Add Class Weight Distribution Chart
+# ---------------------------
+def plot_class_weight_distribution(class_counts, class_weights):
+    class_names = ['Proper Form', 'Poor Form']
+    
+    # Create a figure with two subplots side by side
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    
+    # First subplot: Class counts
+    ax1.bar(class_names, class_counts, color=['#3498db', '#e74c3c'])
+    ax1.set_title('Class Distribution in Dataset')
+    ax1.set_ylabel('Number of Samples')
+    ax1.set_ylim(0, max(class_counts) * 1.2)
+    
+    # Add count values on top of bars
+    for i, count in enumerate(class_counts):
+        ax1.text(i, count + (max(class_counts) * 0.05), f"{int(count)}", 
+                ha='center', va='bottom', fontweight='bold', fontsize=12)
+    
+    # Second subplot: Class weights
+    weights_np = class_weights.cpu().numpy()
+    ax2.bar(class_names, weights_np, color=['#3498db', '#e74c3c'])
+    ax2.set_title('Class Weights for Balanced Loss')
+    ax2.set_ylabel('Weight Value')
+    ax2.set_ylim(0, max(weights_np) * 1.2)
+    
+    # Add weight values on top of bars
+    for i, weight in enumerate(weights_np):
+        ax2.text(i, weight + (max(weights_np) * 0.05), f"{weight:.6f}", 
+                ha='center', va='bottom', fontweight='bold', fontsize=12)
+    
+    # Add a title for the entire figure
+    fig.suptitle('Class Weight Distribution Analysis', fontsize=16)
+    fig.tight_layout(rect=[0, 0, 1, 0.95])  # Adjust layout to make room for suptitle
+    
+    # Save the figure
+    plt.savefig('class_weight_distribution.png')
+    print("Class weight distribution chart saved as 'class_weight_distribution.png'")
+    plt.show()
+
+# # Plot the class weight distribution
+# plot_class_weight_distribution(class_counts, class_weights)
+
 criterion = nn.BCELoss(weight=class_weights)
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 num_epochs = 50

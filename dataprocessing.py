@@ -58,12 +58,15 @@ def create_semg_data(semg_folder: str = 'semg', data_folder: str = 'data') -> No
                 semg_frame_data = np.empty(8)
                 semg_frame_data[0] = session_num
                 # Set each value in frame array to corresponding value
-                for j in range(6):
-                    semg_frame_data[j+1] = lines[i+j]
-                if int(session_num) <= 14:
-                    semg_frame_data[7] = int(lines[i+6]) - 1
-                else:
-                    semg_frame_data[7] = int(lines[i+6])                    
+                try:
+                    for j in range(6):
+                        semg_frame_data[j+1] = lines[i+j]
+                    if int(session_num) <= 14:
+                        semg_frame_data[7] = int(lines[i+6]) - 1
+                    else:
+                        semg_frame_data[7] = int(lines[i+6]) 
+                except IndexError:
+                    break             
                 # Add frame array to 2d session array
                 semg_session_data = np.vstack((semg_session_data, semg_frame_data)).astype(np.float32)
         # Save session array in dict
