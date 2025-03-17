@@ -69,7 +69,7 @@ pip install -r requirements.txt
 4. **Process the Data**
    - Run the data processing script to create the necessary data files:
      ```
-     python dataprocessing.py
+     python data_processing.py
      ```
    - This will generate:
      - `pose_data.npz`: Processed pose keypoints data
