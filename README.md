@@ -26,6 +26,7 @@ This system works by:
 - OpenPose
 
 ### Python Packages
+- Create a python virtual environment then install requirements
 ```
 pip install -r requirements.txt
 ```
@@ -38,6 +39,7 @@ pip install -r requirements.txt
 ├── semg/                      # Directory for EMG sensor data
 ├── saved_models/              # Directory for saving PyTorch models
 ├── classification.json        # Form classification labels (Key is session #, value is 1 for proper, 0 for poor {"0": "1", "1": "0"})
+├── .env                       # Stores OPENPOSE_PATH variable which should be equal to absolute path for openPose.exe
 ```
 
 ## Setup Instructions
@@ -59,8 +61,7 @@ pip install -r requirements.txt
    - Save the sEMG data from serial outputs as text files using PuTTy in the `semg` directory
 
 3. **Install OpenPose**
-   - Follow the installation instructions from the [OpenPose repository](https://github.com/CMU-Perceptual-Computing-Lab/openpose)
-   - Move all of the openpose files into the same root directory as the repository
+   - Run the `setup.ps1` file to install openPose and initialize repository as needed
    - Run the openpose script to save the output JSON files in the 'pose' directory
       ```
      python openpose_script.py
