@@ -32,7 +32,7 @@ Remove-Item -Path $zipFilePath -Force
 Remove-Item -Path $extractionPath -Recurse -Force
 
 # Create the required folders
-$folders = @("folder1", "folder2", "folder3", "folder4")
+$folders = @("semg", "data", "pose", "saved_models")
 foreach ($folder in $folders) {
     $folderPath = "$PSScriptRoot\$folder"
     if (-Not (Test-Path -Path $folderPath)) {
