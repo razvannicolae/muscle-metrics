@@ -88,7 +88,7 @@ pip install -r requirements.txt
      ```
      python form_classification_model.py
      ```
-   - This will train and save the model as `saved_models/emg_estimator_model_10sec_1sensor.pth`
+   - This will train and save the model as `ssaved_models/emg_form_classifier.pth`
 
 
 ## Usage
